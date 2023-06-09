@@ -23,6 +23,7 @@ import (
 const (
 	scqsize       = 1 << 16
 	cacheLineSize = unsafe.Sizeof(cpu.CacheLinePad{})
+	remapStep     = 5
 )
 
 func uint64Get63(value uint64) uint64 {
@@ -56,9 +57,5 @@ func newSCQFlags(isSafe bool, isEmpty bool, cycle uint64) uint64 {
 }
 
 func cacheRemap16Byte(index uint64) uint64 {
-	const cacheLineSize = cacheLineSize / 2
-	rawIndex := index & uint64(scqsize-1)
-	cacheLineNum := (rawIndex) % (scqsize / uint64(cacheLineSize))
-	cacheLineIdx := rawIndex / (scqsize / uint64(cacheLineSize))
-	return cacheLineNum*uint64(cacheLineSize) + cacheLineIdx
+	return (index * remapStep) & (scqsize - 1)
 }
